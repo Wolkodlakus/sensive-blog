@@ -29,10 +29,6 @@ def serialize_tag(tag):
     }
 
 
-def get_likes_count(post):
-    return post.likes.all().count()
-
-
 def index(request):
 
     #most_popular_posts = sorted(Post.objects.all(), key=get_likes_count, reverse=True)[:5]
