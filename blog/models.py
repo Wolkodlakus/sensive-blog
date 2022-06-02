@@ -39,9 +39,6 @@ class TagQuerySet(models.QuerySet):
         return popular_tags
 
 
-
-
-
 class Post(models.Model):
     objects = PostQuerySet.as_manager()
     title = models.CharField('Заголовок', max_length=200)
