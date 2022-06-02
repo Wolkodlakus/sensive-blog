@@ -9,6 +9,26 @@ class PostQuerySet(models.QuerySet):
         posts_at_year = self.filter(published_at__year=year).order_by('published_at')
         return posts_at_year
 
+    def popular(self):
+        return Post.objects.annotate(likes_count=models.Count('likes')).order_by('-likes_count')
+
+    def fetch_with_comments_count(self):
+        """
+        Добавляет отдельное поле с числом комментариев к каждому посту,
+        для ускорения агрегации по другому полю,
+        избежав лишнего задвоения данных и ускорения работы
+        """
+        posts = self #Стоит ли использовать list для принудительного дёргания базы?
+        posts_ids = [post.id for post in posts]
+        posts_with_comments = Post.objects.filter(id__in=posts_ids)\
+            .annotate(comments_count=models.Count('comments'))
+        ids_and_comments = posts_with_comments.values_list('id', 'comments_count')
+        count_for_id = dict(ids_and_comments)
+        for post in posts:
+            post.comments_count = count_for_id[post.id]
+
+        return posts
+
 
 class TagQuerySet(models.QuerySet):
 
@@ -17,6 +37,9 @@ class TagQuerySet(models.QuerySet):
             posts_count=models.Count('posts')
         ).order_by('-posts_count')
         return popular_tags
+
+
+
 
 
 class Post(models.Model):
