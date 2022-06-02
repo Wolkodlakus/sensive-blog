@@ -18,7 +18,7 @@ class PostQuerySet(models.QuerySet):
         для ускорения агрегации по другому полю,
         избежав лишнего задвоения данных и ускорения работы
         """
-        posts = self #Стоит ли использовать list для принудительного дёргания базы?
+        posts = list(self) #Стоит ли использовать list для принудительного дёргания базы?
         posts_ids = [post.id for post in posts]
         posts_with_comments = Post.objects.filter(id__in=posts_ids)\
             .annotate(comments_count=models.Count('comments'))
