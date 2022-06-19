@@ -5,15 +5,15 @@ from blog.models import Post, Tag
 
 
 def get_most_popular_tags(limit):
-    return list(Tag.objects.popular()[:limit].annotate(posts_count=Count('posts')))
+    return Tag.objects.popular()[:limit].annotate(posts_count=Count('posts'))
 
 
 def get_most_popular_posts(limit):
-    return list(Post.objects.
-                popular()[:limit].
-                prefetch_related('author').
-                prefetch_related(Prefetch('tags', queryset=Tag.objects.annotate(posts_count=Count('posts')))).
-                fetch_with_comments_count())
+    return Post.objects.popular()[:limit]\
+        .prefetch_related('author')\
+        .prefetch_related(Prefetch('tags',
+                                   queryset=Tag.objects.annotate(posts_count=Count('posts'))))\
+        .fetch_with_comments_count()
 
 
 def serialize_post(post):
